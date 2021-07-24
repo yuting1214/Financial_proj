@@ -1,6 +1,6 @@
 Create TABLE Daily_stock_price (
   Date DATE NOT NULL,
-  Stock_id VARCHAR(6) PRIMARY KEY,
+  Stock_id VARCHAR(6),
   Volume BIGINT CHECK (Volume >= 0),
   Value BIGINT CHECK (Value >= 0),
   Open NUMERIC(7, 2),
