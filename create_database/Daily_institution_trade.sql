@@ -18,7 +18,7 @@ CREATE TABLE Daily_institution_trade (
   Dealer_self_balance BIGINT,
   Dealer_Hedging_buy BIGINT CHECK (Dealer_Hedging_buy >= 0),
   Dealer_Hedging_sell BIGINT CHECK (Dealer_Hedging_sell >= 0),
-  Dealer_Hedging_balance,
+  Dealer_Hedging_balance BIGINT,
   Investment_Trust_buy BIGINT CHECK (Investment_Trust_buy >= 0),
   Investment_Trust_sell BIGINT CHECK (Investment_Trust_sell >= 0),
   Investment_Trust_balance BIGINT
