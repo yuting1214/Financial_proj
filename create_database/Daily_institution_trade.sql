@@ -1,5 +1,5 @@
 CREATE TABLE Daily_institution_trade (
-  Datetime DATE NOT NULL,
+  Date DATE NOT NULL,
   Stock_id VARCHAR(6),
   Foreigner_buy BIGINT CHECK (Foreigner_buy >= 0),
   Foreigner_sell BIGINT CHECK (Foreigner_sell >= 0),
@@ -23,5 +23,4 @@ CREATE TABLE Daily_institution_trade (
   Investment_Trust_sell BIGINT CHECK (Investment_Trust_sell >= 0),
   Investment_Trust_balance BIGINT
   );
-  
   
