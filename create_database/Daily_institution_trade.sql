@@ -1,6 +1,6 @@
 CREATE TABLE Daily_institution_trade (
   Datetime DATE NOT NULL,
-  Stock_id SMALLINT PRIMARY KEY,
+  Stock_id VARCHAR(6),
   Foreigner_buy BIGINT CHECK (Foreigner_buy >= 0),
   Foreigner_sell BIGINT CHECK (Foreigner_sell >= 0),
   Foreigner_balance BIGINT,
