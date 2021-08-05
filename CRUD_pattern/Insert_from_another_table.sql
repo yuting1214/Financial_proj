@@ -11,3 +11,8 @@ INSERT INTO table2 (column1, column2, column3, ...)
 SELECT column1, column2, column3, ...
 FROM table1
 WHERE condition;
+
+## Provide values
+INSERT INTO table_name(column1, column2, …)
+VALUES (value1, value2, …)
+RETURNING *;
