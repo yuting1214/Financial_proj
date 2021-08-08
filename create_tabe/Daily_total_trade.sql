@@ -1,4 +1,4 @@
-Create table Daily_total_trade(
+CREATE TABLE Daily_total_trade(
   Date DATE NOT NULL,
   Taiex_value BIGINT CHECK (Taiex_value >= 0),
   Taiex_volume BIGINT CHECK (Taiex_volume >= 0),
