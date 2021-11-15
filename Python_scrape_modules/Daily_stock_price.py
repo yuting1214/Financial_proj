@@ -26,17 +26,43 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
                 conn.close()
         export_date = pd.Timestamp(rows[0]).strftime('%Y-%m-%d')
         return export_date
-    # 2. Create scraped date
-    def create_scrape_date(current_date, specified_date = None):
+    # 2. Get closed date
+    def get_closed_date():
+        conn_params = {
+        "host" : "localhost",
+        "database" : "Fin_proj",
+        "user" : "postgres",
+        "password" : "nckumark"
+        }
+        sql = "SELECT date \
+           FROM public.closed_date ;"
+        try:
+            # connect to the PostgreSQL database
+            conn = psycopg2.connect(**conn_params)
+            # create a new cursor
+            cur = conn.cursor()
+            # execute the SQL statement
+            cur.execute(sql)
+            rows = cur.fetchall()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+        export_date_list = pd.to_datetime(pd.DataFrame(rows)[0])
+        return export_date_list
+    # 3. Create scraped date
+    def create_scrape_date(current_date, closed_date_list, specified_date = None):
         if specified_date:
             to_date = pd.to_datetime(specified_date)
         else:
             to_date = pd.Timestamp.now()
         date_range = pd.date_range(pd.to_datetime(current_date) + pd.Timedelta('1d'), to_date, freq = 'D').to_series()
         # Monday=0, Sunday=6
-        work_date = list(date_range.index[~ date_range.dt.dayofweek.isin([5,6])])
-        return work_date
-    # 3. Get current target stock id
+        open_date = list(date_range.index[(~ date_range.dt.dayofweek.isin([5,6])) & (~date_range.index.isin(closed_date_list))])
+        return open_date
+    # 4. Get current target stock id
     def get_current_stock_id():
         conn_params = {
         "host" : "localhost",
@@ -62,8 +88,7 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
                 conn.close()
         export_stock_list = pd.DataFrame(rows)[0].tolist()
         return export_stock_list
-
-    # 4. Scrape list
+    # 5. Scrape list
     def daily_scrape_listed(scrape_date):
         # Self-defined function
         # 1. Generate url
@@ -121,8 +146,7 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
         return_df = parse_return(scrape_date, content)
         print(f'The listed data on {scrape_date} successfully scraped!')
         return return_df
-    
-    # 5. Scrape OTC
+    # 6. Scrape OTC
     def daily_scrape_otc(scrape_date):
         # Self-defined function
         # 1. Generate url
@@ -172,13 +196,12 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
         return_df = parse_return(scrape_date, content)
         print(f'The otc data on {scrape_date} successfully scraped!')
         return return_df
-    
-    # 6. Organized data
+    # 7. Organized data
     def organized_scrape_data(listed_df, otc_df, stock_id_list):
         total_df = pd.concat([listed_df, otc_df], ignore_index=True)
         export_df = total_df[total_df.Stock_id.isin(stock_id_list)].copy().reset_index(drop = True)
         return export_df
-    # 7. Insert into database
+    # 8. Insert into database
     def insert_function(df, table):
         conn_params = {
             "host" : "localhost",
@@ -203,7 +226,7 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
             return 1
         cursor.close()
         conn.close()
-    # 8. Update latest date
+    # 9. Update latest date
     def update_latest_date(date):
         conn_params = {
         "host" : "localhost",
@@ -229,12 +252,15 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
         finally:
             if conn is not None:
                 conn.close()
-    # 9. Execute update
+    # 10. Execute update
     current_date = get_current_updated_date()
-    date_list = create_scrape_date(current_date, to_date)
-    print('Update date list: {}'.format(date_list))
+    closed_date_list = get_closed_date()
+    date_list = create_scrape_date(current_date, closed_date_list, specified_date = None)
+    start_date = date_list[0].strftime('%Y-%m-%d')
+    end_date = date_list[-1].strftime('%Y-%m-%d')
+    print(f'Scrape starting from: {start_date} to {end_date}')
     stock_id_list = get_current_stock_id()
-    for date in date_list:
+    for date in tqdm(date_list):
         listed_df = daily_scrape_listed(date)
         otc_df = daily_scrape_otc(date)
         target_df = organized_scrape_data(listed_df, otc_df, stock_id_list)
