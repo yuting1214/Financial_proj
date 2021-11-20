@@ -144,7 +144,8 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
         content = scrape_unit(url)
         assert content is not None
         return_df = parse_return(scrape_date, content)
-        print(f'The listed data on {scrape_date} successfully scraped!')
+        scrape_date_str = scrape_date.strftime('%Y/%m/%d')
+        print(f'The listed data on {scrape_date_str} successfully scraped!')
         return return_df
     # 6. Scrape OTC
     def daily_scrape_otc(scrape_date):
@@ -194,7 +195,8 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
         content = scrape_unit(url)
         assert content is not None
         return_df = parse_return(scrape_date, content)
-        print(f'The otc data on {scrape_date} successfully scraped!')
+        scrape_date_str = scrape_date.strftime('%Y/%m/%d')
+        print(f'The otc data on {scrape_date_str} successfully scraped!')
         return return_df
     # 7. Organized data
     def organized_scrape_data(listed_df, otc_df, stock_id_list):
@@ -260,6 +262,7 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
     end_date = date_list[-1].strftime('%Y-%m-%d')
     print(f'Scrape starting from: {start_date} to {end_date}')
     stock_id_list = get_current_stock_id()
+    execution_time = len(date_list)
     for date in tqdm(date_list):
         listed_df = daily_scrape_listed(date)
         otc_df = daily_scrape_otc(date)
@@ -268,4 +271,6 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
         insert_function(final_target_df, target_table)
         update_latest_date(date)
         print(f"{date} data is finished")
-        time.sleep(sleep_sec)
+        execution_time -= 1
+        if execution_time > 0:
+            time.sleep(sleep_sec)
