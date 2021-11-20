@@ -101,7 +101,8 @@ def daily_three_insti_buying_update(target_table, sleep_sec, to_date = None):
             while retry_times >= 0:
                 try:
                     res = requests.get(url, headers=headers)
-                    break
+                    if res != None:
+                        break
                 except (requests.ConnectionError, requests.ReadTimeout) as error:
                     print(error)
                     print('Retry one more time after 60s', retry_times, 'times left')
@@ -153,7 +154,8 @@ def daily_three_insti_buying_update(target_table, sleep_sec, to_date = None):
         content = scrape_unit(url)
         assert content is not None
         return_df = parse_return(scrape_date, content)
-        print(f'The listed data on {scrape_date} successfully scraped!')
+        scrape_date_str = scrape_date.strftime('%Y/%m/%d')
+        print(f'The listed data on {scrape_date_str} successfully scraped!')
         return return_df
     
     # 6. Scrape OTC
@@ -220,7 +222,8 @@ def daily_three_insti_buying_update(target_table, sleep_sec, to_date = None):
         content = scrape_unit(url)
         assert content is not None
         return_df = parse_return(scrape_date, content)
-        print(f'The otc data on {scrape_date} successfully scraped!')
+        scrape_date_str = scrape_date.strftime('%Y/%m/%d')
+        print(f'The otc data on {scrape_date_str} successfully scraped!')
         return return_df
     # 7. Organized data
     def organized_scraped_data(listed_df, otc_df, stock_id_list):
@@ -286,6 +289,7 @@ def daily_three_insti_buying_update(target_table, sleep_sec, to_date = None):
     end_date = date_list[-1].strftime('%Y-%m-%d')
     print(f'Scrape starting from: {start_date} to {end_date}')
     stock_id_list = get_current_stock_id()
+    execution_time = len(date_list)
     for date in tqdm(date_list):
         listed_df = scrape_listed_three_insti(date)
         otc_df = scrape_otc_three_insti(date)
@@ -294,4 +298,6 @@ def daily_three_insti_buying_update(target_table, sleep_sec, to_date = None):
         insert_function(final_target_df, target_table)
         update_latest_date(date)
         print(f"{date} data is finished")
-        time.sleep(sleep_sec)
+        execution_time -= 1
+        if execution_time > 0:
+            time.sleep(sleep_sec)
