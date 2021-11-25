@@ -1,7 +1,7 @@
 CREATE TABLE Daily_institution_total_trade (
   Date DATE NOT NULL,
-  Foreigner_buy_total BIGINT CHECK (Foreigner_buy_total >= 0)
-  Foreigner_sell_total BIGINT CHECK (Foreigner_sell_total >= 0),
+  Foreigner_total_buy BIGINT CHECK (Foreigner_total_buy >= 0)
+  Foreigner_total_sell BIGINT CHECK (Foreigner_total_sell >= 0),
   Foreigner_total_balance BIGINT,
   Foreign_Invester_total_buy BIGINT CHECK (Foreign_Invester_total_buy >= 0),
   Foreign_Invester_total_sell BIGINT CHECK (Foreign_Invester_total_sell >= 0),
