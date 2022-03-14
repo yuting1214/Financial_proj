@@ -8,7 +8,7 @@ def monthly_revenue_update(target_table, sleep_sec, to_date = None):
         "password" : "nckumark"
         }
         sql = "SELECT * \
-           FROM public.latest_updated_montly_revenue \
+           FROM public.latest_updated_monthly_revenue \
            LIMIT 1;"
         try:
             # connect to the PostgreSQL database
@@ -134,7 +134,7 @@ def monthly_revenue_update(target_table, sleep_sec, to_date = None):
         "user" : "postgres",
         "password" : "nckumark"
         }
-        sql = """ UPDATE latest_updated_montly_revenue
+        sql = """ UPDATE latest_updated_monthly_revenue
                     SET latest_date = %s """
         try:
             # connect to the PostgreSQL database
