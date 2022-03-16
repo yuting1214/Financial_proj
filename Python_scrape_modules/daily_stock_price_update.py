@@ -136,8 +136,9 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
                     target_df[column] = target_df[column].replace({'--':None}).str.replace(',', '').astype('float')
                 else:
                     pass
-            target_df.columns = ['Date', 'Stock_id', 'Volume', 'Value', 'Open', 'Max', 'Min', 'Close',
-                        'Spread', 'Turnover']
+            target_df['漲跌價差'] = np.where(total_df['漲跌(+/-)'] == '-', -target_df['漲跌價差'], target_df['漲跌價差'])
+            target_df.columns = ['Date', 'Stock_id', 'Volume', 'Value', 'Open',
+                                 'Max', 'Min', 'Close','Spread', 'Turnover']
             return target_df
         # Execution
         url = url_generator(scrape_date)
