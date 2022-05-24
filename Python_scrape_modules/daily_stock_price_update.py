@@ -105,20 +105,16 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
             while retry_times >= 0:
                 try:
                     res = requests.get(url, headers=headers)
-                    break
+                    content = res.json()
+                    columns = str(content['fields9'])
+                    assert columns == default_columns
+                    return_df = pd.DataFrame(content['data9'])
+                    return return_df
                 except (requests.ConnectionError, requests.ReadTimeout) as error:
                     print(error)
                     print('Retry one more time after 40s', retry_times, 'times left')
                     time.sleep(40)
                     retry_times -= 1
-            try:
-                content = res.json()
-                columns = str(content['fields9'])
-                assert columns == default_columns
-                return_df = pd.DataFrame(content['data9'])
-                return return_df
-            except:
-                return None
         # 3. Parse data
         def parse_return(date, content):
             date_str = date.strftime('%Y-%m-%d')
@@ -162,18 +158,14 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
             while retry_times >= 0:
                 try:
                     res = requests.get(url, headers=headers)
-                    break
+                    content = res.json()
+                    return_df = pd.DataFrame(content['aaData'])
+                    return return_df
                 except (requests.ConnectionError, requests.ReadTimeout) as error:
                     print(error)
                     print('Retry one more time after 60s', retry_times, 'times left')
                     time.sleep(40)
                     retry_times -= 1
-            try:
-                content = res.json()
-                return_df = pd.DataFrame(content['aaData'])
-                return return_df
-            except:
-                return None
         # 3. Parse data
         def parse_return(date, content):
             target_df = content.iloc[:, [0, 7, 8, 4, 5, 6, 2, 3, 9]].copy()
