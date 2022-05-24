@@ -138,7 +138,7 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
                     pass
             target_df['漲跌價差'] = np.where(total_df['漲跌(+/-)'] == '-', -target_df['漲跌價差'], target_df['漲跌價差'])
             target_df.columns = ['Date', 'Stock_id', 'Volume', 'Value', 'Open',
-                                 'Max', 'Min', 'Close','Spread', 'Turnover']
+                                 'High', 'Low', 'Close','Spread', 'Turnover']
             return target_df
         # Execution
         url = url_generator(scrape_date)
@@ -178,12 +178,12 @@ def daily_stock_price_update(target_table, sleep_sec, to_date = None):
         def parse_return(date, content):
             target_df = content.iloc[:, [0, 7, 8, 4, 5, 6, 2, 3, 9]].copy()
             target_df.insert(0, 'Date', date)
-            target_df.columns = ['Date', 'Stock_id', 'Volume', 'Value', 'Open', 'Max', 'Min', 'Close',
+            target_df.columns = ['Date', 'Stock_id', 'Volume', 'Value', 'Open', 'High', 'Low', 'Close',
                         'Spread', 'Turnover']
             for column in target_df.columns:
                 if column in ['Volume', 'Value', 'Turnover']:
                     target_df[column] = target_df[column].str.replace(',', '').astype('int64')
-                elif column in ['Open', 'Max', 'Min', 'Close']:
+                elif column in ['Open', 'High', 'Low', 'Close']:
                     target_df[column] = target_df[column].replace({'----':None}).str.replace(',', '').astype('float')
                 elif column in ['Date', 'Stock_id']:
                     pass
