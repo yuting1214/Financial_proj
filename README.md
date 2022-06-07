@@ -31,13 +31,12 @@ PyBack has 6 main components(Temp):
 
 Reference:
 (http://gbeced.github.io/pyalgotrade/docs/v0.20/html/tutorial.html)
-Strategies
-Feeds
-Brokers
-DataSeries
-Technicals
-Optimizer
-
+* Strategies
+* Feeds
+* Brokers
+* DataSeries
+* Technicals
+* Optimizer
 
 ## Currenat Progress
 
