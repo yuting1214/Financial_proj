@@ -20,14 +20,27 @@
 - [Quick start](#quick-start)
 - [Status](#status)
 
+## Tutorial
+
+PyBack has 6 main components(Temp):
+
+* Data
+* Strategy
+* Trade
+* TA(Technical analysis)
+
+Reference:
+(http://gbeced.github.io/pyalgotrade/docs/v0.20/html/tutorial.html)
+Strategies
+Feeds
+Brokers
+DataSeries
+Technicals
+Optimizer
+
+
 ## Currenat Progress
 
-### Established table
-1. daily_stock_price (Stock, Daily
-2. daily_institution_trade (Stock, Daily
-3. daily_total_return_index (
-4. Daily_total_trade
-
-### Update new info function
-
+1. Backtesting modules
+2. 
 
