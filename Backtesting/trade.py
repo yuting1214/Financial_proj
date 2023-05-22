@@ -1,0 +1,59 @@
+def all_meet_same_rule(indicator_dict, price_df, cash, commission):
+    def Buy_stock(target_df, cash, commission, method):
+        assert method in ['from_high', 'from_low', 'random'], 'method must be from_high, from_low or random'
+        original_series = target_df[target_df.columns[target_df.columns != 'stock_id'][0]]
+        if method == 'from_high':
+            index = original_series.sort_values(ascending=False).index
+        elif method == 'from_low':
+            index = original_series.sort_values(ascending=True).index
+        else:
+            sample_size = target_df.shape[0]
+            index = np.random.choice(sample_size, sample_size, replace=False)
+        used_fund = 0
+        unit = 1000
+        sub_index = 0
+        cost_list = []
+        for sub_index in range(len(index)):
+            stock_price = original_series[index[sub_index]]
+            cost_list.append(stock_price)
+            used_fund += stock_price * unit * (1+commission)
+            if used_fund > cash:
+                break
+        if sub_index == 0:
+            remain_cash = cash
+            return_stock = {}
+        else:
+            remain_cash = cash - used_fund + stock_price * unit * (1+commission)
+            target_stock = target_df.loc[index[:sub_index], 'stock_id'].tolist()
+            return_stock = dict(zip(target_stock, cost_list[:sub_index]))
+        return remain_cash, return_stock 
+    transaction_history = {}
+    current_hold_all_info = {}# {'stock_id':cost}
+    current_cash = cash
+    buy_price_by = 'open'
+    sell_price_by = 'close'
+    method = 'from_low'
+    indicator_dict = indicator_dict['buy']
+    for date in indicator_dict.keys():
+        meet_all_stock_id = indicator_dict[date]
+        # Sold first
+        sold_stock = current_hold_all_info.keys() - meet_all_stock_id 
+        cost_list = []
+        for sold_stock_id in sold_stock:
+            cost_list.append(current_hold_all_info[sold_stock_id])
+            current_hold_all_info.pop(sold_stock_id)
+        target_df = price_df.loc[(price_df.stock_id.isin(sold_stock)) & (price_df.date == date), sell_price_by]
+        revenue_list = target_df.tolist()
+        current_cash += (target_df * (1 - (commission + 0.003)) * 1000).sum()
+        sold_stock_all_info = dict(zip(sold_stock, zip(cost_list, revenue_list))) 
+        # Buy new
+        available_stock = meet_all_stock_id - current_hold_all_info.keys() 
+        target_df = price_df.loc[(price_df.stock_id.isin(available_stock)) & (price_df.date == date) \
+                                & (price_df[buy_price_by] > 0), ['stock_id', buy_price_by]].reset_index(drop = True)
+        current_cash, new_hold = Buy_stock(target_df, current_cash, commission, method)
+        current_hold_all_info.update(new_hold)
+        current_hold_all_info_return = current_hold_all_info.copy()
+        # Record
+        transaction_history[date] =  {'current_hold':current_hold_all_info_return, 'current_cash':current_cash,
+                                  'sold_stock':sold_stock_all_info, 'bought_stock':new_hold}
+    return transaction_history
