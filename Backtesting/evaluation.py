@@ -1,6 +1,7 @@
 def Evaluation_table(transaction_record, price_df):
     """
     Generates an evaluation table based on transaction records and price data.
+    When OHLC data is unavailable for evaluation, impute with the data in previous open date or impute o if trace back more than 5 days.
 
     Args:
         transaction_record (dict): A dictionary containing transaction records with dates as keys.
