@@ -1,22 +1,23 @@
 def daily_total_trade_update(target_table, sleep_sec, to_date = None):
-    # 1. Get current updated date
-    def get_current_updated_date():
+    # 1. Retreive last updated date
+    def get_last_date(table):
         conn_params = {
         "host" : "localhost",
         "database" : "Fin_proj",
         "user" : "postgres",
         "password" : "nckumark"
         }
-        sql = "SELECT * \
-           FROM public.latest_updated_daily_total_trade \
-           LIMIT 1;"
+        sql = """   SELECT *
+                    FROM latest_updated_date
+                    WHERE table_name = %s
+                    """
         try:
             # connect to the PostgreSQL database
             conn = psycopg2.connect(**conn_params)
             # create a new cursor
             cur = conn.cursor()
             # execute the SQL statement
-            cur.execute(sql)
+            cur.execute(sql, (table,))
             rows = cur.fetchone()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -24,7 +25,7 @@ def daily_total_trade_update(target_table, sleep_sec, to_date = None):
         finally:
             if conn is not None:
                 conn.close()
-        export_date = pd.Timestamp(rows[0]).strftime('%Y-%m-%d')
+        export_date = rows[1].strftime('%Y-%m-%d')
         return export_date
     # 2. Create listed month index
     def month_generator_listed(start_date, specified_date = None):
@@ -159,22 +160,24 @@ def daily_total_trade_update(target_table, sleep_sec, to_date = None):
         cursor.close()
         conn.close()
     # 8. Update latest date
-    def update_latest_date(date):
+    def update_latest_date(date, table):
         conn_params = {
         "host" : "localhost",
         "database" : "Fin_proj",
         "user" : "postgres",
         "password" : "nckumark"
         }
-        sql = """ UPDATE latest_updated_daily_total_trade 
-                    SET latest_date = %s """
+        sql = """ UPDATE latest_updated_date
+                    SET latest_date = %s
+                    WHERE table_name = %s
+                    """
         try:
             # connect to the PostgreSQL database
             conn = psycopg2.connect(**conn_params)
             # create a new cursor
             cur = conn.cursor()
             # execute the UPDATE  statement
-            cur.execute(sql, (date,))
+            cur.execute(sql, (date, table))
             # Commit the changes to the database
             conn.commit()
             # Close communication with the PostgreSQL database
@@ -185,7 +188,7 @@ def daily_total_trade_update(target_table, sleep_sec, to_date = None):
             if conn is not None:
                 conn.close()
     # Execution
-    start_date = get_current_updated_date()
+    start_date = get_last_date(target_table)
     month_list = [month_generator_listed(start_date, to_date), 
                   month_generator_otc(start_date, to_date)]
     content_len = len(month_list[0])
@@ -197,7 +200,7 @@ def daily_total_trade_update(target_table, sleep_sec, to_date = None):
         insert_function(inserted_df, target_table)
         newest_date = inserted_df.Date.max()
         if pd.notna(newest_date):
-            update_latest_date(newest_date)
+            update_latest_date(newest_date, target_table)
         content_len -= 1
         if content_len > 0:
             time.sleep(sleep_sec)
