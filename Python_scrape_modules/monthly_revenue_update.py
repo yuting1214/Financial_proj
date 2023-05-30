@@ -1,22 +1,23 @@
 def monthly_revenue_update(target_table, sleep_sec, to_date = None):
     # 1. Get current updated date
-    def get_current_updated_date():
+    def get_last_date(table):
         conn_params = {
         "host" : "localhost",
         "database" : "Fin_proj",
         "user" : "postgres",
         "password" : "nckumark"
         }
-        sql = "SELECT * \
-           FROM public.latest_updated_monthly_revenue \
-           LIMIT 1;"
+        sql = """   SELECT *
+                    FROM latest_updated_date
+                    WHERE table_name = %s
+                    """
         try:
             # connect to the PostgreSQL database
             conn = psycopg2.connect(**conn_params)
             # create a new cursor
             cur = conn.cursor()
             # execute the SQL statement
-            cur.execute(sql)
+            cur.execute(sql, (table,))
             rows = cur.fetchone()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -24,7 +25,7 @@ def monthly_revenue_update(target_table, sleep_sec, to_date = None):
         finally:
             if conn is not None:
                 conn.close()
-        export_date = pd.Timestamp(rows[0]).strftime('%Y-%m-%d')
+        export_date = rows[1].strftime('%Y-%m-%d')
         return export_date
     # 2. Create listed month index
     def month_generator_listed(start_date, specified_date = None):
@@ -127,22 +128,24 @@ def monthly_revenue_update(target_table, sleep_sec, to_date = None):
         last_date_current_month = pd.to_datetime('/'.join(month_str.split('_'))) + pd.offsets.MonthEnd(1, normalize = True)
         return last_date_current_month + pd.Timedelta('11d')
     # 7. Update latest date
-    def update_latest_date(date):
+    def update_latest_date(date, table):
         conn_params = {
         "host" : "localhost",
         "database" : "Fin_proj",
         "user" : "postgres",
         "password" : "nckumark"
         }
-        sql = """ UPDATE latest_updated_monthly_revenue
-                    SET latest_date = %s """
+        sql = """ UPDATE latest_updated_date
+                    SET latest_date = %s
+                    WHERE table_name = %s
+                    """
         try:
             # connect to the PostgreSQL database
             conn = psycopg2.connect(**conn_params)
             # create a new cursor
             cur = conn.cursor()
             # execute the UPDATE  statement
-            cur.execute(sql, (date,))
+            cur.execute(sql, (date, table))
             # Commit the changes to the database
             conn.commit()
             # Close communication with the PostgreSQL database
@@ -153,7 +156,7 @@ def monthly_revenue_update(target_table, sleep_sec, to_date = None):
             if conn is not None:
                 conn.close()
     # 8. Execute update
-    current_date = pd.to_datetime(get_current_updated_date())
+    current_date = pd.to_datetime(get_last_date(target_table))
     month_list = month_generator_listed(current_date)
     if len(month_list) > 0:
         start_date = month_list[0]
@@ -165,7 +168,7 @@ def monthly_revenue_update(target_table, sleep_sec, to_date = None):
         otc_df = scrape_monthly_revenue('otc', month)          
         target_df = organized_scrape_data(listed_df, otc_df)
         insert_function(target_df, target_table)
-        update_latest_date(correct_date(month))
+        update_latest_date(correct_date(month), target_table)
         print(f"{month} data is finished")
         execution_time -= 1
         if execution_time > 0:
