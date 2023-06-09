@@ -73,16 +73,16 @@ def stock_category_update(target_table, source):
                     sub_industry_stock_list = []
                     for sub_industry_index in range(sub_industry_num):
                         stock_list = [item.string.split(" ") for item in sub_industry_content[sub_industry_index].find_all("a", class_="industry-stream-company")]
-                        stock = [ [industry_names[url_index]] + [stream_name[stream_index]] + [sub_industry_name[sub_industry_index]] + item for item in stock_list]
+                        stock = [ [industry_names[url_index]] + [industry_url[url_index]] + [stream_name[stream_index]] + [sub_industry_name[sub_industry_index]] + item for item in stock_list]
                         Final_list += stock
             else:
-                stock = [ [industry_names[url_index]] + [None] + item for item in second_layer_rank_stock]
+                stock = [ [industry_names[url_index]] + [industry_url[url_index]] + [None] + item for item in second_layer_rank_stock]
                 Final_list += stock
             print(str(url_index+1) + "th industry is finished")
             time.sleep(0.5)
-        export_df = pd.DataFrame(Final_list, columns =  ["產業", "產業位階", "子產業", "公司代號", "公司簡稱"])
+        export_df = pd.DataFrame(Final_list, columns =  ["產業", "產業說明連結", "產業位階", "子產業", "公司代號", "公司簡稱"])
         export_df['來源'] = '財報狗'
-        return export_df[["來源", "產業", "產業位階", "子產業", "公司代號", "公司簡稱"]]
+        return export_df[["來源", "產業", "產業位階", "子產業", "公司代號", "公司簡稱", "產業說明連結"]]
     # 3. Scrape 定錨(skipped)
     # 4. Organize two dfs(skipped)
     # 5. Delete old
