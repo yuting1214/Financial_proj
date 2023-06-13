@@ -1,6 +1,6 @@
 import pandas as pd
 
-def calculate_wr_ratio(start, end, cond_df, open_df, close_df):
+def transaction_table(start, end, cond_df, open_df, close_df):
     """
     Calculates the WR ratio for stock trading.
 
@@ -54,8 +54,12 @@ def calculate_wr_ratio(start, end, cond_df, open_df, close_df):
     wr_df = wr_df.drop_duplicates(subset=['date_buy', 'stock_id']).reset_index(drop=True)
     
     # Merge with open_df and close_df to get the stock prices for buy and sell dates
-    final_wr_df = pd.merge(
+    trans_df = pd.merge(
         pd.merge(wr_df, open_df, left_on=['date_buy', 'stock_id'], right_on=['date', 'stock_id'], how='left'),
         close_df, left_on=['date_sell', 'stock_id'], right_on=['date', 'stock_id'], how='left')[['stock_id', 'open', 'close', 'date_buy', 'date_sell']]
     
-    return final_wr_df
+    return trans_df
+
+def calculate_wr_ratio(trans_df):
+    settled_df = trans_df[~trans_df.date_sell.isna()]
+    return ((settled_df['close'] > settled_df['open']).mean()).round(2)
