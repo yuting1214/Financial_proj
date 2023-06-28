@@ -23,9 +23,15 @@
 
 ## Quick-Start
 
-### Data visualizations
-
 ### Dashboards
+![Dashboard](/img/dashboard.gif)
+|:--:| 
+| Dashboard to evalute the strategy. |
+
+### Data visualizations
+![Tree plot](/img/tree_plot.png)
+|:--:| 
+| Tree plot to investigate the flow of capitals. |
 
 ## Three components
 
