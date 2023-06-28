@@ -45,8 +45,8 @@ Create an unbiased and efficient backtesting system to discover the profitable s
 ### Data visualization & App
 Objective:
 Create informative dashboards to evaluate straties' peformance, tracking targets, and discovering hidden patterns. 
-* Data visualization
-* App(Plotly-Dash)
+* [Data visualization](https://github.com/yuting1214/Financial_proj/tree/master/Visualization/plots)
+* [App(Plotly-Dash)](https://github.com/yuting1214/Financial_proj/tree/master/Visualization/apps_collection)
 
 ## In-depth modules
 
