@@ -33,14 +33,14 @@
 Objective:
 Create a robust and stable database with timely update system and automatic pipeline.
 
-* Web scraping
-* Database
-* Airflow
+* [Web scraping](https://github.com/yuting1214/Financial_proj/tree/master/Scrape)
+* [Database](https://github.com/yuting1214/Financial_proj/tree/master/Database)
+* [Airflow](https://github.com/yuting1214/Financial_proj/tree/master/Airflow)
 
 ### Strategy & Backtesting
 Objective:
 Create an unbiased and efficient backtesting system to discover the profitable strategies.
-* Backtesting
+* [Backtesting](https://github.com/yuting1214/Financial_proj/tree/master/Backtesting)
 
 ### Data visualization & App
 Objective:
