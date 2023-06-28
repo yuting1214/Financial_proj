@@ -6,11 +6,11 @@
   <h3 align="center">Logo</h3>
 
   <p align="center">
-    Short description
+    A comprehensive system enable discovering profitable strategies in the market of TWSE and TPEx.
     <br>
-    <a href="https://reponame/issues/new?template=bug.md">Report bug</a>
-    ·
-    <a href="https://reponame/issues/new?template=feature.md&labels=feature">Request feature</a>
+    <a href="https://github.com/yuting1214/Financial_proj/issues/new?template=bug.md">Report bugs</a>
+    |
+    <a href="https://github.com/yuting1214/Financial_proj/issues/new?template=feature.md&labels=feature">Request features</a>
   </p>
 </p>
 
@@ -18,28 +18,53 @@
 ## Table of contents
 
 - [Quick start](#quick-start)
-- [Status](#status)
+- [Three Components](#three-components)
+- [In-depth modules](#in-depth-modules)
+- [Database configuration](#database-configuration)
+- [Techniques](#techniques)
+- [Current progress](#current-progress)
 
-## Tutorial
+## Quick-Start
 
-PyBack has 6 main components(Temp):
+### Data visualizations
 
-* Data
-* Strategy
-* Trade
-* TA(Technical analysis)
+### Dashboards
 
-Reference:
-(http://gbeced.github.io/pyalgotrade/docs/v0.20/html/tutorial.html)
-* Strategies
-* Feeds
-* Brokers
-* DataSeries
-* Technicals
-* Optimizer
+## Three components
+
+### Automation & ETL
+Objective:
+Create a robust and stable database with timely update system and automatic pipeline.
+
+* Web scraping
+* Database
+* Airflow
+
+### Strategy & Backtesting
+Objective:
+Create an unbiased and efficient backtesting system to discover the profitable strategies.
+* Backtesting
+
+### Data visualization & App
+Objective:
+Create informative dashboards to evaluate straties' peformance, tracking targets, and discovering hidden patterns. 
+* Data visualization
+* App(Plotly-Dash)
+
+## In-depth modules
+
+### Scrape:
+
+### Backtest:
+
+## Database configuration:
+
+## Techniques:
 
 ## Currenat Progress
 
-1. Backtesting modules
-2. 
+1. Refactor Backtesting modules
+2. Deploy on online host service
+
+
 
