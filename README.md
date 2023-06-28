@@ -1,10 +1,7 @@
 <p align="center">
-  <a href="https://example.com/">
-    <img src="https://via.placeholder.com/72" alt="Logo" width=72 height=72>
+  <a href="https://github.com/yuting1214/Financial_proj/">
+    <img src="https://github.com/yuting1214/Financial_proj/blob/master/img/fin_tech.png" alt="Logo" width=500 height=300>
   </a>
-
-  <h3 align="center">Logo</h3>
-
   <p align="center">
     A comprehensive system enable discovering profitable strategies in the market of TWSE and TPEx.
     <br>
@@ -61,7 +58,12 @@ Create informative dashboards to evaluate straties' peformance, tracking targets
 
 ## Techniques:
 
-## Currenat Progress
+![tabular_pipeline](/img/Financial_proj-Techinical_Tool.jpg)
+|:--:| 
+| Relevant techniques used in the project |
+
+
+## Current Progress
 
 1. Refactor Backtesting modules
 2. Deploy on online host service
