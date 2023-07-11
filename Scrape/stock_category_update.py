@@ -27,7 +27,35 @@ def stock_category_update(target_table, source):
                 conn.close()
         export_date = rows[1].strftime('%Y-%m-%d')
         return export_date    
-    # 2. Scrape 財報狗
+    # 2. Retreive old 
+    def get_last_update(source):
+        conn_params = {
+        "host" : "localhost",
+        "database" : "Fin_proj",
+        "user" : "postgres",
+        "password" : "nckumark"
+        }
+        sql = """   SELECT *
+                    FROM stock_category
+                    WHERE source = %s
+                    """
+        try:
+            # connect to the PostgreSQL database
+            conn = psycopg2.connect(**conn_params)
+            # create a new cursor
+            cur = conn.cursor()
+            # execute the SQL statement
+            cur.execute(sql, (source,))
+            rows = cur.fetchall()
+            column_names = [desc[0] for desc in cur.description]
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+        return pd.DataFrame(rows, columns=column_names) 
+    # 3. Scrape 財報狗
     def statementdog_category_scrape():
         '''
         Scrape the info about stock categories from https://statementdog.com/taiex
@@ -83,9 +111,9 @@ def stock_category_update(target_table, source):
         export_df = pd.DataFrame(Final_list, columns =  ["產業", "產業說明連結", "產業位階", "子產業", "公司代號", "公司簡稱"])
         export_df['來源'] = '財報狗'
         return export_df[["來源", "產業", "產業位階", "子產業", "公司代號", "公司簡稱", "產業說明連結"]]
-    # 3. Scrape 定錨(skipped)
-    # 4. Organize two dfs(skipped)
-    # 5. Delete old
+    # 4. Scrape 定錨(skipped)
+    # 5. Organize two dfs(skipped)
+    # 6. Delete old
     def delete_old_data(source):
         conn_params = {
         "host" : "localhost",
@@ -112,7 +140,7 @@ def stock_category_update(target_table, source):
                 conn.close()
         print(f'stock_category with source {source} is deleted!')
         return None 
-    # 6. Insert into database
+    # 7. Insert into database
     def insert_function(df, table):
         conn_params = {
             "host" : "localhost",
@@ -137,7 +165,7 @@ def stock_category_update(target_table, source):
             return 1
         cursor.close()
         conn.close()
-    # 7. Update latest date
+    # 8. Update latest date
     def update_latest_date(date, table):
         conn_params = {
         "host" : "localhost",
@@ -165,12 +193,28 @@ def stock_category_update(target_table, source):
         finally:
             if conn is not None:
                 conn.close()
+    # 9. Log updating difference
+    def log_diff(new_df, old_df):
+        old_df.columns = new_df.columns
+        old_df.loc[old_df['產業位階']=='', '產業位階'] = None
+        merged = new_df.merge(old_df, how='outer', indicator=True)
+        diff_df = merged[merged['_merge']!='both'].reset_index(drop=True)
+        diff_df = diff_df.drop(columns=['_merge'])
+        print('Update data')
+        print(diff_df)
+        export_dir = 'C:/Users/l501l/Financial_proj/data/category_info/財報狗更新'
+        os.chdir(export_dir)
+        file_name = pd.Timestamp.today().strftime('%Y-%m-%d') + '_財報狗更新.csv'
+        diff_df.to_csv(file_name, index = False, encoding = 'utf-8-sig')
+        return None
     # Execution
     last_date = get_last_date(target_table)
     today_date = pd.Timestamp.today().strftime('%Y-%m-%d')
+    old_df = get_last_update(source)
     if source == '財報狗':
-        dog_df = statementdog_category_scrape()
+        new_df = statementdog_category_scrape()
+    log_diff(new_df, old_df)
     delete_old_data(source)
-    insert_function(dog_df, target_table)
+    insert_function(new_df, target_table)
     update_latest_date(today_date, target_table)
-    print(f"Update for {source} on {today_date} is finished")
+    print(f'Update for {source} on {today_date} is finished')
