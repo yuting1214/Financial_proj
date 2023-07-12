@@ -47,8 +47,9 @@ def transaction_table(start, end, cond_df, open_df, close_df):
     ## (1) Set date_sell as NaT for the last date_buy
     wr_df.loc[wr_df.date_buy == last_date_index, 'date_sell'] = pd.NaT
     
-    ## (2) Remove rows where date_sell is less than date_buy
-    wr_df = wr_df[~(wr_df['date_sell'] < wr_df['date_buy'])]
+    ## (2) Remove duplicates
+    wr_df = wr_df[~((wr_df['date_sell'] < wr_df['date_buy']) & (wr_df[['date_buy', 'stock_id']].duplicated(keep='last')))]
+    wr_df.loc[(wr_df['date_sell'] < wr_df['date_buy']), 'date_sell']  = pd.NaT
     
     ## (3) Keep the first transaction for each stock
     wr_df = wr_df.drop_duplicates(subset=['date_buy', 'stock_id']).reset_index(drop=True)
